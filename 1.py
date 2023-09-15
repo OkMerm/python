@@ -17,7 +17,7 @@ while x <= x_max:
     print(x, ' ', y, ' ')
     x = x + step
 
-with open("results/data.cvs", "w") as file:
+with open("./results/data.cvs", "w") as file:
     writer = csv.writer(file)
     for i in range(0, len(x_arr)):
         writer.writerow([str(i + 1), str(x_arr[i]), str(y_arr[i])])    
