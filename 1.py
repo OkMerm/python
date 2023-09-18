@@ -16,6 +16,9 @@ while x <= x_max:
     y_arr.append(y)
     print(x, ' ', y, ' ')
     x = x + step
+    
+if not os.path.isdir("results"):
+     os.mkdir("results")
 
 with open("./results/data.cvs", "w") as file:
     writer = csv.writer(file)
