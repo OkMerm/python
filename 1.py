@@ -1,6 +1,7 @@
 import math
 import matplotlib.pyplot as plt
 import csv
+import os
 
 x_min = -10
 x_max = 10
