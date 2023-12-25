@@ -57,7 +57,7 @@ if __name__ == '__main__':
     probesPos_m = [2]
 
     # Параметры слоев
-    layers_cont = [LayerContinuous(0, eps=3.0, sigma=0.0)]
+    layers_cont = [LayerContinuous(0, eps=9.0, sigma=0.0)]
 
     # Скорость обновления графика поля
     speed_refresh = 15
@@ -144,13 +144,13 @@ if __name__ == '__main__':
     source = Source(signal, 0.0, Sc, eps[sourcePos], mu[sourcePos])
 
     Ez = np.zeros(maxSize)
-    Hy = np.zeros(maxSize)
+    Hy = np.zeros(maxSize - 1)
 
-    # Параметры отображения поля H
-    display_field = Hy
-    display_ylabel = 'Hy, А/м'
-    display_ymin = -1.1 / W0
-    display_ymax = 1.1 / W0
+    # Параметры отображения поля E
+    display_field = Ez
+    display_ylabel = 'Ez, В/м'
+    display_ymin = -2.1
+    display_ymax = 2.1
 
     # Создание экземпляра класса для отображения
     # распределения поля в пространстве
@@ -166,16 +166,18 @@ if __name__ == '__main__':
 
     for t in range(1, maxTime):
         # Расчет компоненты поля H
-        Hy[:-1] = Hy[:-1] + (Ez[1:] - Ez[:-1]) * Sc / (W0 * mu)
+        Hy = Hy + (Ez[1:] - Ez[:-1]) * Sc / (W0 * mu)
+
+        # Граничное условие PMC (справа)
+        Hy[-1] = 0
 
         # Источник возбуждения
         Hy[sourcePos - 1] += source.getFieldH(t) 
         # Ez[1] в предыдущий момент времени
         oldEzLeft = Ez[1]
-        # Ez[-2] в предыдущий момент времени
-        oldEzRight = Ez[-2]
+       
         # Расчет компоненты поля E
-        Ez[1:] = Ez[1:] + (Hy[1:] - Hy[:-1]) * Sc * W0
+        Ez[1:-1] = ceze[1: -1] * Ez[1: -1] + cezh[1: -1] * (Hy[1:] - Hy[: -1])
         # Граничные условия ABC второй степени (слева)
         Ez[0] = (k1Left * (k2Left * (Ez[2] + oldEzLeft2[0]) +
                              k3Left * (oldEzLeft1[0] + oldEzLeft1[2] - Ez[1] - oldEzLeft2[1]) -
@@ -208,3 +210,5 @@ if __name__ == '__main__':
     plt.xlabel('f, ГГц')
     display.stop()
     plt.show()
+   
+    
