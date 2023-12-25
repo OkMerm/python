@@ -122,7 +122,7 @@ if __name__ == '__main__':
     cezh = W0 / (eps * (1.0 + loss))
 
     #Расчет коэффициентов для граничных условий
-    #Sc' для правой границы
+    #Sc' для левой границы
     
     Sc1Left = Sc / np.sqrt(mu[0] * eps[0])
 
@@ -144,13 +144,13 @@ if __name__ == '__main__':
     source = Source(signal, 0.0, Sc, eps[sourcePos], mu[sourcePos])
 
     Ez = np.zeros(maxSize)
-    Hy = np.zeros(maxSize - 1)
+    Hy = np.zeros(maxSize)
 
-    # Параметры отображения поля E
-    display_field = Ez
-    display_ylabel = 'Ez, В/м'
-    display_ymin = -2.1
-    display_ymax = 2.1
+    # Параметры отображения поля H
+    display_field = Hy
+    display_ylabel = 'Hy, А/м'
+    display_ymin = -1.1 / W0
+    display_ymax = 1.1 / W0
 
     # Создание экземпляра класса для отображения
     # распределения поля в пространстве
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
     for t in range(1, maxTime):
         # Расчет компоненты поля H
-        Hy = Hy + (Ez[1:] - Ez[:-1]) * Sc / (W0 * mu)
+        Hy[:-1] = Hy[:-1] + (Ez[1:] - Ez[:-1]) * Sc / (W0 * mu)
 
         # Источник возбуждения
         Hy[sourcePos - 1] += source.getFieldH(t) 
@@ -175,7 +175,7 @@ if __name__ == '__main__':
         # Ez[-2] в предыдущий момент времени
         oldEzRight = Ez[-2]
         # Расчет компоненты поля E
-        Ez[1:-1] = ceze[1: -1] * Ez[1: -1] + cezh[1: -1] * (Hy[1:] - Hy[: -1])
+        Ez[1:] = Ez[1:] + (Hy[1:] - Hy[:-1]) * Sc * W0
         # Граничные условия ABC второй степени (слева)
         Ez[0] = (k1Left * (k2Left * (Ez[2] + oldEzLeft2[0]) +
                              k3Left * (oldEzLeft1[0] + oldEzLeft1[2] - Ez[1] - oldEzLeft2[1]) -
